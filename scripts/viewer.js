@@ -119,6 +119,16 @@ function getBaseMap(name){
 function hidePanels(){
 	$(".panel").hide();
     $(".alert").hide();
+	clearResults();
+}
+
+
+function clearResults(){
+    $("input[type=textbox]").val("");
+    currentElement = "";
+    layers = ["location_1", "location_2", "route", "markets", "area", "circle"];
+    for (let i = 0; i < layers.length; i++)
+        removeLayerByName(mainMap, layers[i]);
 }
 
 function showPanel(id){
@@ -187,6 +197,61 @@ $("#btnService").click(function(){
 	})
 });
 
+const sizes = {
+    "small_markets": 15,
+    "local_markets": 20,
+    "medium_markets": 25,
+    "capital_markets": 40
+};
+
+
+$("#btnSearch").click(function(){
+    removeLayerByName(mainMap, "markets");
+    $("#pnl-search-alert").hide();
+ 
+    $.ajax({
+        url:"./services/search.py?location=" +
+            $("#location-search").val() +
+            "&distance=" +
+            $("#val").text() +
+            "&srid=3857",
+        type: "GET",
+        success: function(data){
+            if (data.length != 0){
+                let features = [];
+                for (var i = 0; i < data.length; i++){    
+                    var feature = new ol.format.GeoJSON().readFeature(data[i].geom);
+                    feature.setStyle(
+                        new ol.style.Style({ 
+                            image: new ol.style.Icon({
+                                src: './images/market.png',            
+                                width: sizes[data[i].categorie]
+                            })
+                        })
+                    );
+                    features.push(feature);
+                }
+ 
+                const vectorSource = new ol.source.Vector({
+                    features: features,
+                })
+ 
+                const vectorLayer = new ol.layer.Vector({
+                    name: "markets",
+                    source: vectorSource,
+                })
+                
+                mainMap.addLayer(vectorLayer)
+            } 
+        },
+        error: function(data){
+            $("#pnl-search-alert").html("Error: An error occurred while executing the tool.");
+            $("#pnl-search-alert").show();
+        }
+    })
+});
+
+
 
 $("#btnRoute").click(function () { 
 	removeLayerByName(mainMap, "route");
@@ -220,6 +285,51 @@ $("#btnRoute").click(function () {
 		error: function(data){
 			$("#pnl-route-alert").html("Error: An error occurred while executing the tool.");
 			$("#pnl-route-alert").show();
+		}
+	})
+});
+
+
+$("#btnClosest").click(function () { 
+	removeLayerByName(mainMap, "markets");
+	$("#pnl-closest-alert").hide();
+	
+	$.ajax({
+		url: "./services/closest_markets.py?location=" + 
+			$("#location-closest").val() + 
+			"&srid=3857",
+		type: "GET",
+		success: function(data){
+			if (data.length != 0){
+				let features = [];
+				for (var i = 0; i < data.length; i++){
+					var feature = new ol.format.GeoJSON().readFeature(data[i].geometry);
+					feature.setStyle(
+						new ol.style.Style({ 
+							image: new ol.style.Icon({
+								src: './images/market.png',			
+								width: sizes[data[i].categorie]
+							})
+						})
+					);
+					features.push(feature);
+				}
+
+				const vectorSource = new ol.source.Vector({
+					features: features,
+				})
+
+				const vectorLayer = new ol.layer.Vector({
+					name: "markets",
+					source: vectorSource,
+				})
+				
+				mainMap.addLayer(vectorLayer)
+			} 
+		},
+		error: function(data){
+			$("#pnl-closest-alert").html("Error: An error occurred while executing the tool.");
+			$("#pnl-closest-alert").show();
 		}
 	})
 });
