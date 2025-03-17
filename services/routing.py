@@ -1,14 +1,17 @@
-#!D:/burundi/.venv/Scripts/python.exe
+#!c:/wamp64/www/market_analytics/.venv/Scripts/python.exe
 
 # Block 1: Import packages 
+
 import os 
 import json 
 import psycopg2 
 from psycopg2.extras import RealDictCursor 
 import cgi
 
+
+
 # Block 2 : Get inputs from the client
-form = cgi.FieldStorage() 
+form = form = cgi.FieldStorage() 
 source = form.getvalue('source') 
 target = form.getvalue('target') 
 srid = form.getvalue('srid')
@@ -17,7 +20,7 @@ target = target.split(",")
 srid = int(srid)
 
 # Block 3: connect to the database 
-file = open(os.path.dirname(os.path.abspath(__file__)) + "\db.credentials") 
+file = open(os.path.dirname(os.path.abspath(__file__)) + r"\db.credentials") 
 connection_string = file.readline() + file.readline() 
 pg_conn = psycopg2.connect(connection_string) 
 pg_cursor = pg_conn.cursor(cursor_factory=RealDictCursor)
@@ -25,8 +28,8 @@ pg_cursor = pg_conn.cursor(cursor_factory=RealDictCursor)
 # Block 4: Define a function to get the closest node on the network
 def get_closest_node(coord, srid): 
     selectQuery = """SELECT id, 
-        ST_Distance(the_geom, ST_Transform(ST_GeomFromText('POINT(%s %s)', %d), st_srid(the_geom))) AS distance
-        FROM vector.bi_main_roads_vertices_pgr  
+        ST_Distance(geom, ST_Transform(ST_GeomFromText('POINT(%s %s)', %d), st_srid(geom))) AS distance
+        FROM vector.bi_main_roads_vertices_gpr  
         ORDER BY 2 ASC
         LIMIT 1""" % (float(coord[0]), float(coord[1]), srid) 
     pg_cursor.execute(selectQuery) 

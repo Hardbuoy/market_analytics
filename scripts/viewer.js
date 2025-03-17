@@ -5,6 +5,41 @@ $("input[type=textbox]").focus(function() {
 	currentElement = $(this).attr("id");
 });
 
+$("#distance-slider").on("input", function(){
+    $('#val').text($("#distance-slider")[0].value);
+    drawCircle();
+});
+
+
+function drawCircle(){
+    centroid = $("#" + currentElement).val().split(",");
+    centroid = [parseFloat(centroid[0]), parseFloat(centroid[1])];
+    radious = parseFloat($("#val").text());
+ 
+    let circle = new ol.geom.Circle(centroid, radious * 1000.0);
+ 
+    const vectorSource = new ol.source.Vector({
+        features: [new ol.Feature(circle)],
+    });
+      
+    const vectorLayer = new ol.layer.Vector({
+        name: "circle",
+        source: vectorSource,
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: '#ff0000',
+                width: 2,
+            }),
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.4)'
+            })
+        })
+    });
+ 
+    removeLayerByName(mainMap, "circle");
+    mainMap.addLayer(vectorLayer);
+}
+
 function init(){
     // Define the map view
 	let mainView = new ol.View({

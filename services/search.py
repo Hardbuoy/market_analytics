@@ -1,4 +1,4 @@
-#!D:/burundi/.venv/Scripts/python.exe
+#! c:/wamp64/www/market_analytics/.venv/Scripts/python.exe
  
 # Block 1: Import packages 
 import os 
@@ -15,7 +15,7 @@ radious = form.getvalue("distance")
 srid = form.getvalue("srid")
  
 # Block 3: connect to the database 
-file = open(os.path.dirname(os.path.abspath(__file__)) + "\db.credentials") 
+file = open(os.path.dirname(os.path.abspath(__file__)) + r"\db.credentials") 
 connection_string = file.readline() + file.readline() 
 pg_conn = psycopg2.connect(connection_string) 
 pg_cursor = pg_conn.cursor(cursor_factory=RealDictCursor)
