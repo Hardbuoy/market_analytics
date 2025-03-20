@@ -28,8 +28,8 @@ pg_cursor = pg_conn.cursor(cursor_factory=RealDictCursor)
 # Block 4: Define a function to get the closest node on the network
 def get_closest_node(coord, srid): 
     selectQuery = """SELECT id, 
-        ST_Distance(geom, ST_Transform(ST_GeomFromText('POINT(%s %s)', %d), st_srid(geom))) AS distance
-        FROM vector.bi_main_roads_vertices_gpr  
+        ST_Distance(the_geom, ST_Transform(ST_GeomFromText('POINT(%s %s)', %d), st_srid(the_geom))) AS distance
+        FROM vector.bi_main_roads_vertices_pgr  
         ORDER BY 2 ASC
         LIMIT 1""" % (float(coord[0]), float(coord[1]), srid) 
     pg_cursor.execute(selectQuery) 

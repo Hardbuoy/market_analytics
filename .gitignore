@@ -3,3 +3,6 @@ db.credentials
 
 #environments
 .venv
+
+#database
+burundi - bk2023-10-13.sql
